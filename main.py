@@ -2,7 +2,9 @@ import os
 import sys
 import traceback
 from typing import List
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from dotenv import load_dotenv
 
 from selenium import webdriver
 import pyttsx3 as p
@@ -11,6 +13,8 @@ import speech_recognition as sr
 import pyjokes
 import pygame
 
+load_dotenv()
+
 engine = p.init()
 engine.setProperty('rate', 200)
 voices: List[Voice] = engine.getProperty('voices')
@@ -18,10 +22,12 @@ engine.setProperty('voice', voices[1].id)
 r = sr.Recognizer()
 _options = Options()
 _options.headless = True
-driver = webdriver.Chrome(options=_options)
+_service = Service(executable_path=os.getenv('chrome_driver'))
+driver = webdriver.Chrome(options=_options, service=_service)
 pygame.init()
 pygame.mixer.init()
 
+dev = os.getenv('dev') == 'True'
 
 def speak(text):
     print(f'Out: {text}')
@@ -31,6 +37,8 @@ def speak(text):
 
 def listen(source):
     print("listening...")
+    if dev:
+        return input('In: ')
     try:
         audio = r.listen(source=source)
         text = r.recognize_google(audio)
@@ -58,11 +66,11 @@ def play(query):
 
 
 def Gambinopl():
-    lists_of_gabino = os.listdir("C:/Users/Dominik Vogel/PycharmProjects/Traver 4.0/Music/")
+    lists_of_gabino = os.listdir()
 
     for song in lists_of_gabino:
         if song.endswith(".mp3"):
-            file_path = "C:/Users/Dominik Vogel/PycharmProjects/Traver 4.0/Music/" + song
+            file_path = "./" + song
             pygame.mixer.music.load(str(file_path))
             pygame.mixer.music.play()
             print("playing Childish Gambino")
