@@ -2,6 +2,7 @@ import os
 import sys
 import traceback
 from typing import List
+from selenium.webdriver.chrome.options import Options
 
 from selenium import webdriver
 import pyttsx3 as p
@@ -10,13 +11,14 @@ import speech_recognition as sr
 import pyjokes
 import pygame
 
-
 engine = p.init()
 engine.setProperty('rate', 200)
 voices: List[Voice] = engine.getProperty('voices')
 engine.setProperty('voice', voices[1].id)
 r = sr.Recognizer()
-driver = webdriver.Chrome("C:/Program Files/Google/Chrome/chromedriver_win32/chromedriver.exe")
+_options = Options()
+_options.headless = True
+driver = webdriver.Chrome(options=_options)
 pygame.init()
 pygame.mixer.init()
 
@@ -67,6 +69,7 @@ def Gambinopl():
             while pygame.mixer.music.get_busy() == True:
                 continue
 
+
 def weather():
     driver.get(url="https://www.weather-forecast.com/locations/Mauensee/forecasts/latest")
     forecast = driver.find_element("xpath", '/html/body/main/section[3]/div/div/div[2]/div/table/thead/tr[1]/td[1]/p')
@@ -80,13 +83,14 @@ def main():
         r.adjust_for_ambient_noise(source, 1.2)
         while True:
             text = listen(source)
-            if all(x in text for x in ["what", "about", "you"]) or all(x in text for x in ["how", "about", "you"]) or all(x in text for x in ["how", "are", "you"]):
+            if all(x in text for x in ["what", "about", "you"]) or all(
+                    x in text for x in ["how", "about", "you"]) or all(x in text for x in ["how", "are", "you"]):
                 speak("I am very good thank you")
             elif any(x in text for x in ["information", "facts"]):
                 speak("you need information to which topic?")
                 infor = listen(source)
                 if infor == "":
-                   speak("alright then keep your secrets")
+                    speak("alright then keep your secrets")
                 else:
                     speak(f"one moment I am looking for {infor} in wikipedia")
                     print(f"{infor} on wikipedia")
